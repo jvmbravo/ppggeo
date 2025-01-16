@@ -24,17 +24,28 @@
             attribution: 'Map data © OpenStreetMap contributors'
         }).addTo(map);
 
-        // Carrega os dados GeoJSON do Google Drive
-        fetch('https://drive.google.com/uc?id=1dEo3MjgIrL2yPDt6rgEF98TxBAWGTFwh&export=download')
+        // Carrega a camada GeoJSON da raiz do repositório
+        fetch('./br.geojson') // Caminho relativo
             .then(response => response.json())
             .then(data => {
+                // Adiciona o GeoJSON ao mapa com estilo personalizado
                 L.geoJSON(data, {
                     style: function (feature) {
-                        return { color: 'blue', weight: 2 }; // Personalize a borda
+                        return { color: 'blue', weight: 2, fillOpacity: 0.5 }; // Personalize o estilo
+                    },
+                    onEachFeature: function (feature, layer) {
+                        if (feature.properties) {
+                            // Exibe um popup com os atributos da camada
+                            layer.bindPopup(
+                                Object.keys(feature.properties)
+                                    .map(key => `<strong>${key}:</strong> ${feature.properties[key]}`)
+                                    .join('<br>')
+                            );
+                        }
                     }
                 }).addTo(map);
             })
-            .catch(error => console.error('Erro ao carregar GeoJSON:', error));
+            .catch(error => console.error('Erro ao carregar o GeoJSON:', error));
     </script>
 </body>
 </html>
